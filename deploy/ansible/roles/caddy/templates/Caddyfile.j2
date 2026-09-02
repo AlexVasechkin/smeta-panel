@@ -1,0 +1,38 @@
+# {{ ansible_managed }}
+{
+{% if auto_https | bool %}
+    email {{ acme_email }}
+{% else %}
+    auto_https off
+{% endif %}
+}
+
+{% if auto_https | bool %}
+{{ app_domain }} {
+{% else %}
+http://{{ app_domain }} {
+{% endif %}
+    root * {{ app_dir }}/public
+
+    encode zstd gzip
+
+    # Ограничение размера загрузок (генерация/загрузка документов)
+    request_body {
+        max_size 25MB
+    }
+
+    # Закрываем чувствительные файлы (.env, .git и прочие dotfiles),
+    # кроме .well-known (нужен для ACME/выпуска сертификата).
+    @hidden {
+        path */.*
+        not path /.well-known/*
+    }
+    respond @hidden 404
+
+    php_fastcgi unix//run/php/remont-{{ php_version }}.sock
+    file_server
+
+    log {
+        output file /var/log/caddy/remont-access.log
+    }
+}

@@ -1,0 +1,28 @@
+; {{ ansible_managed }}
+; Выделенный PHP-FPM пул для Remont Panel.
+; Процессы работают под {{ deploy_user }} (владелец кода и storage),
+; сокет доступен веб-серверу ({{ web_user }}) для проксирования FastCGI.
+[remont]
+user = {{ deploy_user }}
+group = {{ deploy_user }}
+
+listen = /run/php/remont-{{ php_version }}.sock
+listen.owner = {{ web_user }}
+listen.group = {{ web_user }}
+listen.mode = 0660
+
+pm = dynamic
+pm.max_children = 20
+pm.start_servers = 3
+pm.min_spare_servers = 2
+pm.max_spare_servers = 6
+pm.max_requests = 500
+
+; Логи ошибок PHP этого пула
+php_admin_value[error_log] = /var/log/php{{ php_version }}-fpm-remont.log
+php_admin_flag[log_errors] = on
+
+; Разумные значения для генерации документов и загрузок
+php_admin_value[memory_limit] = 256M
+php_admin_value[upload_max_filesize] = 20M
+php_admin_value[post_max_size] = 25M

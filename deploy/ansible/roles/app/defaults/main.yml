@@ -1,0 +1,3 @@
+---
+# Временный архив проекта на управляющей машине (для deploy_method: local).
+local_archive: "/tmp/remont-panel-deploy.tar.gz"

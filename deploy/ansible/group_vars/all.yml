@@ -1,0 +1,72 @@
+---
+# ── Приложение ────────────────────────────────────────────────────────────────
+app_name: "Remont Panel"
+app_domain: "remont.example.com"          # домен (A-запись должна указывать на сервер)
+app_url: "https://{{ app_domain }}"
+app_env: "production"
+app_debug: false
+app_timezone: "Europe/Moscow"
+app_locale: "ru"
+
+# Способ доставки кода:
+#   local — упаковать локальный проект и распаковать на сервере (git не нужен);
+#   git   — сервер клонирует репозиторий (app_repo/app_version).
+deploy_method: "local"
+
+# Путь к локальному проекту (для deploy_method: local). По умолчанию — корень
+# репозитория относительно этого плейбука (deploy/ansible/../..).
+project_src: "{{ playbook_dir }}/../.."
+
+# Для deploy_method: git. Репозиторий должен быть доступен серверу
+# (публичный, либо deploy-ключ добавлен на сервер/в forge).
+app_repo: "git@github.com:your-org/remont-panel.git"
+app_version: "main"                        # ветка, тег или коммит
+
+# Куда разворачиваем и под каким пользователем работает приложение.
+deploy_user: "deploy"
+app_dir: "/var/www/remont-panel"
+
+# ── Версии рантайма ───────────────────────────────────────────────────────────
+php_version: "8.3"
+node_major: "20"
+
+# ── База данных (внешний управляемый PostgreSQL) ──────────────────────────────
+db_host: "217.18.61.243"
+db_port: 23482
+db_name: "default_db"
+db_user: "gen_user"
+# db_password — задаётся в vault.yml (см. vault.yml.example)
+
+# ── Файловое хранилище ────────────────────────────────────────────────────────
+# local — файлы на диске сервера (storage/app). Для S3 задайте s3 и AWS_* в vault.
+filesystem_disk: "local"
+
+# ── Почта (по умолчанию пишет в лог; заполните для реальной отправки) ──────────
+mail_mailer: "log"
+mail_host: "127.0.0.1"
+mail_port: 2525
+mail_from_address: "no-reply@{{ app_domain }}"
+
+# ── Инфраструктурные опции ────────────────────────────────────────────────────
+# Порт SSH (нестандартный) — firewall откроет именно его, чтобы не потерять доступ.
+ssh_port: 23481
+
+# Caddy сам выпускает и продлевает Let's Encrypt сертификаты.
+auto_https: true                           # false → отдавать только по http (локально/за прокси)
+acme_email: "admin@{{ app_domain }}"       # e-mail для уведомлений ACME
+configure_firewall: true                   # настроить ufw (ssh_port, 80, 443)
+
+# Пользователь, под которым работает веб-сервер (Caddy) — ему нужен доступ к FPM-сокету.
+web_user: "caddy"
+
+# Воркер очереди
+queue_worker_processes: 1
+
+# ── Связка с секретами из vault.yml ───────────────────────────────────────────
+db_password: "{{ vault_db_password }}"
+app_key: "{{ vault_app_key | default('') }}"
+aws_access_key_id: "{{ vault_aws_access_key_id | default('') }}"
+aws_secret_access_key: "{{ vault_aws_secret_access_key | default('') }}"
+aws_default_region: "{{ vault_aws_default_region | default('us-east-1') }}"
+aws_bucket: "{{ vault_aws_bucket | default('') }}"
+aws_endpoint: "{{ vault_aws_endpoint | default('') }}"

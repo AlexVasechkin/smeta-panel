@@ -1,0 +1,18 @@
+# {{ ansible_managed }}
+[Unit]
+Description=Remont Panel queue worker (%i)
+After=network.target postgresql.service
+
+[Service]
+User={{ deploy_user }}
+Group={{ deploy_user }}
+Restart=always
+RestartSec=5
+WorkingDirectory={{ app_dir }}
+ExecStart=/usr/bin/php {{ app_dir }}/artisan queue:work --sleep=3 --tries=3 --max-time=3600
+# Даём воркеру доработать текущую задачу при рестарте деплоем
+ExecStop=/usr/bin/php {{ app_dir }}/artisan queue:restart
+TimeoutStopSec=60
+
+[Install]
+WantedBy=multi-user.target

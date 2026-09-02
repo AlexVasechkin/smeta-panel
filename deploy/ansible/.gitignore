@@ -1,0 +1,5 @@
+# Локальные, не коммитить
+inventory.ini
+group_vars/vault.yml
+*.retry
+.vault_pass

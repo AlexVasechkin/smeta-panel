@@ -1,0 +1,13 @@
+---
+- name: Deploy Remont Panel
+  hosts: web
+  become: true
+
+  roles:
+    - common     # базовые пакеты, deploy-пользователь, firewall
+    # PostgreSQL внешний (управляемый) — локально не ставим; см. db_host/db_port
+    - php        # PHP-FPM + расширения + выделенный пул + composer
+    - node       # Node.js для сборки фронтенда
+    - app        # код, .env, composer/npm, миграции, кэш конфигов
+    - queue      # systemd-воркер очереди + планировщик
+    - caddy      # веб-сервер + автоматический HTTPS (код уже на месте)

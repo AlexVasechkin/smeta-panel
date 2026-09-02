@@ -1,0 +1,30 @@
+---
+# Шаблонный systemd-юнит: remont-worker@1, remont-worker@2, ...
+- name: Install queue worker systemd unit
+  ansible.builtin.template:
+    src: worker.service.j2
+    dest: /etc/systemd/system/remont-worker@.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Reload systemd
+    - Restart queue worker
+
+- name: Flush handlers so the unit is registered before enabling
+  ansible.builtin.meta: flush_handlers
+
+- name: Enable and start queue worker instances
+  ansible.builtin.systemd:
+    name: "remont-worker@{{ item }}.service"
+    enabled: true
+    state: started
+  loop: "{{ range(1, (queue_worker_processes | int) + 1) | list }}"
+
+# Планировщик Laravel (schedule:run каждую минуту).
+- name: Install Laravel scheduler cron
+  ansible.builtin.cron:
+    name: "remont-panel-scheduler"
+    user: "{{ deploy_user }}"
+    minute: "*"
+    job: "cd {{ app_dir }} && /usr/bin/php artisan schedule:run >> /dev/null 2>&1"

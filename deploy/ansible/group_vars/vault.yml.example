@@ -1,0 +1,23 @@
+---
+# Секреты. Скопируйте в vault.yml и зашифруйте:
+#   cp group_vars/vault.yml.example group_vars/vault.yml
+#   ansible-vault encrypt group_vars/vault.yml
+# Запуск: ansible-playbook site.yml --ask-vault-pass
+
+# Пароль пользователя БД.
+vault_db_password: "change-me-strong-password"
+
+# Ключ приложения Laravel. Сгенерируйте локально:
+#   php artisan key:generate --show
+# и вставьте сюда (вида base64:....). Если оставить пустым — ключ будет
+# сгенерирован на сервере при первом деплое и сохранён в .env.
+vault_app_key: ""
+
+# --- Если filesystem_disk: s3 ---
+# vault_aws_access_key_id: ""
+# vault_aws_secret_access_key: ""
+# vault_aws_default_region: "us-east-1"
+# vault_aws_bucket: ""
+# Кастомный эндпоинт для S3-совместимых хранилищ (Yandex/Selectel/MinIO и т.п.).
+# Оставьте пустым для настоящего AWS S3.
+# vault_aws_endpoint: "https://s3.example.com"

@@ -1,0 +1,52 @@
+---
+- name: Add ondrej/php PPA (reliable PHP versions)
+  ansible.builtin.apt_repository:
+    repo: "ppa:ondrej/php"
+    state: present
+    update_cache: true
+
+- name: Install PHP-FPM and extensions
+  ansible.builtin.apt:
+    name:
+      - "php{{ php_version }}-fpm"
+      - "php{{ php_version }}-cli"
+      - "php{{ php_version }}-pgsql"
+      - "php{{ php_version }}-mbstring"
+      - "php{{ php_version }}-xml"
+      - "php{{ php_version }}-curl"
+      - "php{{ php_version }}-zip"      # phpspreadsheet (xlsx/docx)
+      - "php{{ php_version }}-gd"       # phpspreadsheet
+      - "php{{ php_version }}-bcmath"
+      - "php{{ php_version }}-intl"
+      - "php{{ php_version }}-gmp"
+    state: present
+  notify: Restart php-fpm
+
+- name: Ensure PHP-FPM is enabled and running
+  ansible.builtin.service:
+    name: "php{{ php_version }}-fpm"
+    state: started
+    enabled: true
+
+- name: Deploy dedicated FPM pool for the app
+  ansible.builtin.template:
+    src: pool.conf.j2
+    dest: "/etc/php/{{ php_version }}/fpm/pool.d/remont.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart php-fpm
+
+# Отключаем дефолтный www-пул, чтобы работал только наш remont-пул.
+- name: Disable default www pool
+  ansible.builtin.command:
+    cmd: "mv /etc/php/{{ php_version }}/fpm/pool.d/www.conf /etc/php/{{ php_version }}/fpm/pool.d/www.conf.disabled"
+    removes: "/etc/php/{{ php_version }}/fpm/pool.d/www.conf"
+  notify: Restart php-fpm
+
+- name: Install Composer
+  ansible.builtin.get_url:
+    url: https://getcomposer.org/download/latest-stable/composer.phar
+    dest: /usr/local/bin/composer
+    mode: "0755"
+    force: false

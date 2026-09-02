@@ -1,0 +1,10 @@
+---
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Restart queue worker
+  ansible.builtin.systemd:
+    name: "remont-worker@{{ item }}.service"
+    state: restarted
+  loop: "{{ range(1, (queue_worker_processes | int) + 1) | list }}"

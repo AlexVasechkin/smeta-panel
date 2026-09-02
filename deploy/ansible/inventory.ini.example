@@ -1,0 +1,10 @@
+# Скопируйте в inventory.ini и укажите свой сервер.
+# Требуется Ubuntu 22.04/24.04 (или Debian 12) с доступом по SSH и sudo.
+
+[web]
+remont ansible_host=217.18.61.243 ansible_port=23481 ansible_user=root
+
+[web:vars]
+# Если заходите не под root, а под пользователем с sudo:
+# ansible_user=deployadmin
+# ansible_become_password=...   # лучше передавать через --ask-become-pass
