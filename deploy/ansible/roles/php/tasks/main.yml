@@ -28,6 +28,16 @@
     state: started
     enabled: true
 
+# Пул задаёт listen.owner = web_user (caddy). Этот пользователь создаётся пакетом
+# Caddy, но роль caddy идёт позже — поэтому гарантируем его наличие заранее,
+# иначе php-fpm не стартует ("cannot get uid for user"). Пакет Caddy переиспользует.
+- name: Ensure web server user exists (owns the FPM socket)
+  ansible.builtin.user:
+    name: "{{ web_user }}"
+    system: true
+    create_home: false
+    shell: /usr/sbin/nologin
+
 - name: Deploy dedicated FPM pool for the app
   ansible.builtin.template:
     src: pool.conf.j2

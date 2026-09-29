@@ -1,7 +1,7 @@
 ---
 # ── Приложение ────────────────────────────────────────────────────────────────
 app_name: "Remont Panel"
-app_domain: "remont.example.com"          # домен (A-запись должна указывать на сервер)
+app_domain: "smeta-dlya-remonta.online"          # домен (A-запись должна указывать на сервер)
 app_url: "https://{{ app_domain }}"
 app_env: "production"
 app_debug: false
@@ -13,14 +13,19 @@ app_locale: "ru"
 #   git   — сервер клонирует репозиторий (app_repo/app_version).
 deploy_method: "local"
 
+# build_locally: true — собрать зависимости (vendor/) и фронтенд (public/build)
+# на управляющей машине и залить готовыми; на сервере composer/npm не запускаются.
+# Нужно, когда сервер отрезан от GitHub (composer тянет dist-архивы с github.com).
+build_locally: true
+
 # Путь к локальному проекту (для deploy_method: local). По умолчанию — корень
 # репозитория относительно этого плейбука (deploy/ansible/../..).
 project_src: "{{ playbook_dir }}/../.."
 
 # Для deploy_method: git. Репозиторий должен быть доступен серверу
 # (публичный, либо deploy-ключ добавлен на сервер/в forge).
-app_repo: "git@github.com:your-org/remont-panel.git"
-app_version: "main"                        # ветка, тег или коммит
+app_repo: "https://github.com/AlexVasechkin/smeta-panel.git"
+app_version: "deploy"                        # ветка, тег или коммит
 
 # Куда разворачиваем и под каким пользователем работает приложение.
 deploy_user: "deploy"
@@ -31,8 +36,8 @@ php_version: "8.3"
 node_major: "20"
 
 # ── База данных (внешний управляемый PostgreSQL) ──────────────────────────────
-db_host: "217.18.61.243"
-db_port: 23482
+db_host: "192.168.0.5"
+db_port: 5432
 db_name: "default_db"
 db_user: "gen_user"
 # db_password — задаётся в vault.yml (см. vault.yml.example)
@@ -41,20 +46,25 @@ db_user: "gen_user"
 # local — файлы на диске сервера (storage/app). Для S3 задайте s3 и AWS_* в vault.
 filesystem_disk: "local"
 
-# ── Почта (по умолчанию пишет в лог; заполните для реальной отправки) ──────────
-mail_mailer: "log"
-mail_host: "127.0.0.1"
-mail_port: 2525
+# ── Почта ─────────────────────────────────────────────────────────────────────
+# mail_mailer=log — письма только пишутся в лог (реальная отправка не идёт).
+# Для реальной отправки: mailer=smtp + host/port/encryption ниже и креды в vault.
+# mail.ru: порт 587 + tls (STARTTLS) либо 465 + ssl; пароль — «пароль приложения».
+mail_mailer: "smtp"
+mail_host: "smtp.timeweb.ru"
+mail_port: 587
+mail_encryption: "tls"                     # tls (порт 587, STARTTLS) или ssl (порт 465)
 mail_from_address: "no-reply@{{ app_domain }}"
+mail_from_name: "Панель Смета для ремонта онлайн"
+# mail_username / mail_password — секреты, задаются в vault.yml (см. vault.yml.example).
+# Пустые → в .env уйдёт null (уместно для mailer=log).
 
 # ── Инфраструктурные опции ────────────────────────────────────────────────────
-# Порт SSH (нестандартный) — firewall откроет именно его, чтобы не потерять доступ.
-ssh_port: 23481
+# Firewall (ufw) плейбуком не управляется — порты открываются на стороне провайдера.
 
 # Caddy сам выпускает и продлевает Let's Encrypt сертификаты.
 auto_https: true                           # false → отдавать только по http (локально/за прокси)
 acme_email: "admin@{{ app_domain }}"       # e-mail для уведомлений ACME
-configure_firewall: true                   # настроить ufw (ssh_port, 80, 443)
 
 # Пользователь, под которым работает веб-сервер (Caddy) — ему нужен доступ к FPM-сокету.
 web_user: "caddy"
@@ -65,6 +75,8 @@ queue_worker_processes: 1
 # ── Связка с секретами из vault.yml ───────────────────────────────────────────
 db_password: "{{ vault_db_password }}"
 app_key: "{{ vault_app_key | default('') }}"
+mail_username: "{{ vault_mail_username | default('') }}"
+mail_password: "{{ vault_mail_password | default('') }}"
 aws_access_key_id: "{{ vault_aws_access_key_id | default('') }}"
 aws_secret_access_key: "{{ vault_aws_secret_access_key | default('') }}"
 aws_default_region: "{{ vault_aws_default_region | default('us-east-1') }}"
