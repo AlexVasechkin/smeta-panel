@@ -13,6 +13,14 @@ vault_db_password: "change-me-strong-password"
 # сгенерирован на сервере при первом деплое и сохранён в .env.
 vault_app_key: ""
 
+# --- Почта (SMTP) ---
+# Логин почтового ящика (обычно полный адрес) и пароль.
+# Для mail.ru требуется «пароль приложения» (не основной пароль аккаунта):
+#   https://help.mail.ru/mail/security/protection/external
+# Оставьте пустыми, если mail_mailer: log (реальная отправка не нужна).
+vault_mail_username: ""
+vault_mail_password: ""
+
 # --- Если filesystem_disk: s3 ---
 # vault_aws_access_key_id: ""
 # vault_aws_secret_access_key: ""

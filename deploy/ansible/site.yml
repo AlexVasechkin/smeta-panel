@@ -3,6 +3,11 @@
   hosts: web
   become: true
 
+  # Секреты: group_vars/vault.yml не грузится автоматически (нет группы vault),
+  # поэтому подключаем явно. Работает и с зашифрованным vault (--ask-vault-pass).
+  vars_files:
+    - group_vars/vault.yml
+
   roles:
     - common     # базовые пакеты, deploy-пользователь, firewall
     # PostgreSQL внешний (управляемый) — локально не ставим; см. db_host/db_port

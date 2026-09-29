@@ -2,6 +2,8 @@
 {
 {% if auto_https | bool %}
     email {{ acme_email }}
+    # Только Let's Encrypt (ZeroSSL с этого сервера недоступен — исходящий трафик ограничен).
+    acme_ca https://acme-v02.api.letsencrypt.org/directory
 {% else %}
     auto_https off
 {% endif %}

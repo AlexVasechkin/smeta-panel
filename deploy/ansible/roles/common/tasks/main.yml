@@ -33,25 +33,6 @@
     create_home: true
     state: present
 
-# ── Firewall (опционально, без внешних коллекций — через сам ufw) ──────────────
-- name: Configure firewall (ufw)
-  when: configure_firewall | bool
-  block:
-    - name: Install ufw
-      ansible.builtin.apt:
-        name: ufw
-        state: present
-
-    - name: Allow required ports
-      ansible.builtin.command: "ufw allow {{ item }}"
-      loop:
-        - "{{ ssh_port }}/tcp"
-        - "80/tcp"
-        - "443/tcp"
-      register: ufw_allow
-      changed_when: "'Rule added' in ufw_allow.stdout or 'Rules updated' in ufw_allow.stdout"
-
-    - name: Enable ufw
-      ansible.builtin.command: "ufw --force enable"
-      register: ufw_enable
-      changed_when: "'active' in ufw_enable.stdout"
+# Firewall не настраивается Ansible-плейбуком: на этом сервере SSH проброшен
+# на нестандартный внешний порт, и управление ufw приводило к блокировке доступа.
+# Открытие портов (80/443 и SSH) выполняется на стороне провайдера/сервера.

@@ -42,10 +42,8 @@
           tar -czf {{ local_archive }} -C {{ project_src }}
           --exclude='./.git'
           --exclude='./node_modules'
-          --exclude='./vendor'
           --exclude='./.env'
           --exclude='./deploy'
-          --exclude='./public/build'
           --exclude='./public/hot'
           --exclude='./public/storage'
           --exclude='./storage/logs/*.log'
@@ -53,6 +51,7 @@
           --exclude='./bootstrap/cache/*.php'
           --exclude='./.phpunit.result.cache'
           --exclude='./.DS_Store'
+          {{ "" if build_locally else "--exclude=./vendor --exclude=./public/build" }}
           .
       changed_when: true
 
@@ -109,7 +108,10 @@
     - Reload php-fpm
     - Restart queue worker
 
+# build_locally: true → vendor/ и public/build залиты с управляющей машины,
+# на сервере composer/npm не запускаем (актуально, если сервер отрезан от GitHub).
 - name: Install PHP dependencies (production)
+  when: not build_locally
   become: true
   become_user: "{{ deploy_user }}"
   ansible.builtin.command:
@@ -129,6 +131,7 @@
   changed_when: true
 
 - name: Install JS dependencies
+  when: not build_locally
   become: true
   become_user: "{{ deploy_user }}"
   ansible.builtin.command:
@@ -137,6 +140,7 @@
   changed_when: true
 
 - name: Build frontend assets
+  when: not build_locally
   become: true
   become_user: "{{ deploy_user }}"
   ansible.builtin.command:
