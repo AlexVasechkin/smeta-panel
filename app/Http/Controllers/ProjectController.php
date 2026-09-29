@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateProjectRequest;
 use App\Models\City;
 use App\Models\Client;
 use App\Models\Project;
+use App\Services\ProjectSummary;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -81,7 +82,7 @@ class ProjectController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Project $project): Response
+    public function show(Project $project, ProjectSummary $summary): Response
     {
         $project->load(['client:id,name,phone,email', 'city:id,name', 'documents']);
 
@@ -99,6 +100,7 @@ class ProjectController extends Controller
                 'status_color' => $project->status->color(),
                 'start_date' => $project->start_date?->format('Y-m-d'),
                 'notes' => $project->notes,
+                'summary' => $summary->for($project),
                 'client' => $project->client ? [
                     'id' => $project->client->id,
                     'name' => $project->client->name,

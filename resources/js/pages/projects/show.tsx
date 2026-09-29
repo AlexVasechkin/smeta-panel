@@ -18,8 +18,33 @@ interface ProjectDetail {
     status_color: string;
     start_date: string | null;
     notes: string | null;
+    summary: ProjectSummary;
     client: { id: number; name: string; phone: string | null; email: string | null } | null;
     documents: DocumentRow[];
+}
+
+interface ProjectSummary {
+    cash_received: number;
+    contract_total: number;
+    contract_total_discounted: number;
+    positions_total: number;
+    positions_closed: number;
+}
+
+const rubles = new Intl.NumberFormat('ru-RU', {
+    style: 'currency',
+    currency: 'RUB',
+    maximumFractionDigits: 2,
+});
+
+function SummaryStat({ label, value, hint }: { label: string; value: string; hint?: string }) {
+    return (
+        <div>
+            <dt className="text-muted-foreground text-xs">{label}</dt>
+            <dd className="mt-0.5 text-2xl font-semibold tracking-tight tabular-nums">{value}</dd>
+            {hint && <p className="text-muted-foreground mt-1 text-xs">{hint}</p>}
+        </div>
+    );
 }
 
 interface DocumentRow {
@@ -79,6 +104,32 @@ export default function ProjectShow({ project }: { project: ProjectDetail }) {
                     <Field label="Дата начала" value={project.start_date} />
                     <Field label="Заметки" value={project.notes} />
                 </dl>
+
+                <div>
+                    <h2 className="mb-3 text-lg font-medium">Сводка</h2>
+                    <dl className="border-sidebar-border/70 grid gap-4 rounded-xl border p-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <SummaryStat
+                            label="Сумма по договору"
+                            value={rubles.format(project.summary.contract_total)}
+                            hint="Работы + материалы + доп."
+                        />
+                        <SummaryStat
+                            label="Сумма по договору со скидкой"
+                            value={rubles.format(project.summary.contract_total_discounted)}
+                            hint="С учётом скидки на работы"
+                        />
+                        <SummaryStat
+                            label="Получено по объекту"
+                            value={rubles.format(project.summary.cash_received)}
+                            hint="По актам приёма-передачи денег"
+                        />
+                        <SummaryStat
+                            label="Закрыто позиций"
+                            value={`${project.summary.positions_closed} из ${project.summary.positions_total}`}
+                            hint="Полностью закрытые позиции"
+                        />
+                    </dl>
+                </div>
 
                 <div>
                     <h2 className="mb-3 text-lg font-medium">Клиент</h2>

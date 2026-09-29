@@ -133,7 +133,7 @@ class WorkCompletionActData
      *
      * @return array<string, float>
      */
-    private static function closedQuantities(Project $project): array
+    public static function closedQuantities(Project $project): array
     {
         $closed = [];
 

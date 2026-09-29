@@ -9,7 +9,6 @@ const breadcrumbs: BreadcrumbItem[] = [{ title: 'Документы', href: '/do
 interface DocumentRow {
     id: number;
     name: string;
-    file_name: string;
     created_at: string | null;
 }
 
@@ -77,7 +76,6 @@ export default function DocumentsIndex({ projects }: { projects: ProjectGroup[] 
                                                     >
                                                         <div className="flex min-w-0 flex-col">
                                                             <span className="truncate text-sm font-medium">{document.name}</span>
-                                                            <span className="text-muted-foreground truncate text-xs">{document.file_name}</span>
                                                         </div>
                                                         <div className="flex items-center gap-3">
                                                             <span className="text-muted-foreground hidden text-xs sm:inline">

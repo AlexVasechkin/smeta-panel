@@ -47,7 +47,6 @@ class DocumentController extends Controller
                             ->map(fn (Document $document) => [
                                 'id' => $document->id,
                                 'name' => $document->type->label().' '.$document->type_sequence,
-                                'file_name' => $document->fileName(),
                                 'created_at' => $document->created_at?->format('d.m.Y H:i'),
                             ])
                             ->values(),
