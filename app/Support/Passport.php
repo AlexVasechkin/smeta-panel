@@ -6,7 +6,7 @@ use App\Enums\AttributeType;
 
 /**
  * Единый источник правды для паспортных данных физлица,
- * хранящихся в EAV-свойствах клиента.
+ * хранящихся в EAV-свойствах сущности.
  */
 class Passport
 {
@@ -34,7 +34,7 @@ class Passport
     ];
 
     /**
-     * Доп. паспортные поля сверх FIELDS. Используются для клиента и
+     * Доп. паспортные поля сверх FIELDS. Используются для физлица и
      * руководителя организации; у пользователя (User) не применяются.
      *
      * @var array<string, array{code: string, name: string, type: AttributeType, options?: array<int, string>}>
@@ -45,7 +45,7 @@ class Passport
 
     /**
      * Расширенный набор паспортных полей (базовые + доп.) —
-     * для клиента и руководителя организации.
+     * для физлица и руководителя организации.
      *
      * @return array<string, array{code: string, name: string, type: AttributeType, options?: array<int, string>}>
      */

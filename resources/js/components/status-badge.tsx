@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 
-// Соответствие цвета из ProjectStatus::color() классам Tailwind (light/dark).
+// Соответствие имени цвета (приходит с бэкенда) классам Tailwind (light/dark).
 const colorClasses: Record<string, string> = {
     blue: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
     amber: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',

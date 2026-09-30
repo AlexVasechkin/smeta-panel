@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use App\Enums\AttributeType;
 use App\Models\Attribute;
-use App\Models\Project;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -21,7 +21,7 @@ class AttributeFactory extends Factory
         $name = fake()->unique()->words(2, true);
 
         return [
-            'entity_type' => (new Project)->getMorphClass(),
+            'entity_type' => (new User)->getMorphClass(),
             'code' => str($name)->slug('_')->value(),
             'name' => ucfirst($name),
             'type' => fake()->randomElement(AttributeType::cases()),

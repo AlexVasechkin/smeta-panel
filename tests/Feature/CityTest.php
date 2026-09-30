@@ -6,7 +6,6 @@ use App\Models\City;
 use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 class CityTest extends TestCase
@@ -23,6 +22,22 @@ class CityTest extends TestCase
         $organization->members()->create(['user_id' => $user->id, 'is_owner' => true]);
 
         return [$user, $organization];
+    }
+
+    /**
+     * Список городов так, как его собирает потребитель справочника:
+     * доступные организации, только активные, в порядке отображения.
+     *
+     * @return array<int, string>
+     */
+    private function availableNames(?int $organizationId): array
+    {
+        return City::query()
+            ->availableFor($organizationId)
+            ->active()
+            ->ordered()
+            ->pluck('name')
+            ->all();
     }
 
     public function test_it_creates_a_custom_city_for_the_users_organization(): void
@@ -44,32 +59,22 @@ class CityTest extends TestCase
 
     public function test_available_cities_include_global_and_own_org_only(): void
     {
-        [$user, $organization] = $this->userWithOrganization();
+        [, $organization] = $this->userWithOrganization();
         [, $otherOrg] = $this->userWithOrganization();
 
         City::create(['name' => 'Москва', 'sort_order' => 10]);
         City::create(['name' => 'Наш город', 'organization_id' => $organization->id]);
         City::create(['name' => 'Чужой город', 'organization_id' => $otherOrg->id]);
 
-        $this->actingAs($user)
-            ->get(route('projects.create'))
-            ->assertOk()
-            ->assertInertia(fn (Assert $page) => $page
-                ->component('projects/create')
-                ->has('cities', 2)
-                // системный город идёт первым, затем город организации
-                ->where('cities.0.label', 'Москва')
-                ->where('cities.1.label', 'Наш город'));
+        // системный город идёт первым, затем город организации
+        $this->assertSame(['Москва', 'Наш город'], $this->availableNames($organization->id));
     }
 
     public function test_inactive_cities_are_excluded(): void
     {
-        [$user] = $this->userWithOrganization();
         City::create(['name' => 'Скрытый', 'is_active' => false]);
 
-        $this->actingAs($user)
-            ->get(route('projects.create'))
-            ->assertInertia(fn (Assert $page) => $page->has('cities', 0));
+        $this->assertSame([], $this->availableNames(null));
     }
 
     public function test_it_rejects_a_duplicate_city_name(): void

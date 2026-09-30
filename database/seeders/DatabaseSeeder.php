@@ -22,10 +22,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             UserAttributeSeeder::class,
-            ClientAttributeSeeder::class,
             OrganizationAttributeSeeder::class,
             CitySeeder::class,
-            ClientSeeder::class,
         ]);
     }
 }

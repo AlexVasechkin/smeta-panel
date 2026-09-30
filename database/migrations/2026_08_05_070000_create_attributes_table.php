@@ -14,7 +14,7 @@ return new class extends Migration
         // Определения EAV-свойств (справочник атрибутов).
         Schema::create('attributes', function (Blueprint $table) {
             $table->id();
-            $table->string('entity_type');             // тип сущности-владельца (morph class), напр. App\Models\Project
+            $table->string('entity_type');             // тип сущности-владельца (morph class), напр. App\Models\User
             $table->string('code');                    // машинное имя, напр. floor_area
             $table->string('name');                    // человекочитаемое название
             $table->string('type')->default('string'); // App\Enums\AttributeType

@@ -31,7 +31,7 @@ class AttributeValue extends Model
     }
 
     /**
-     * Сущность-владелец значения (Client, Project, …).
+     * Сущность-владелец значения (User, Organization, …).
      *
      * @return MorphTo<Model, $this>
      */

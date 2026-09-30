@@ -160,7 +160,7 @@ export default function OrganizationSettings({
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Организация" description="Реквизиты вашей организации — используются в сметах и документах" />
+                    <HeadingSmall title="Организация" description="Реквизиты вашей организации" />
 
                     <form onSubmit={submit} className="space-y-6">
                         {identityFields.map(renderField)}
