@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\OrganizationType;
 use App\Models\Organization;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -18,6 +19,7 @@ class OrganizationFactory extends Factory
     public function definition(): array
     {
         return [
+            'type' => OrganizationType::Ooo,
             'name' => fake()->company(),
             'legal_name' => 'ООО «'.fake()->company().'»',
             'inn' => (string) fake()->numerify('##########'),
@@ -32,6 +34,7 @@ class OrganizationFactory extends Factory
     public function empty(): static
     {
         return $this->state(fn (array $attributes) => [
+            'type' => null,
             'name' => null,
             'legal_name' => null,
             'inn' => null,
